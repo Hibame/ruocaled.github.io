@@ -1,12 +1,16 @@
 $(document).ready(function () {
 
+    if (!window.localStorage || !window.Worker){
+        $('#timer').html('Your Browser is not supported, please get latest chrome or firefox');
+        $('#timer').show();
+    }
 
     var tickTime = 3 * 60 * 1000;
-    var beforeTick = 20 * 1000; // 20 seconds to prepare;
+
     var timeLeft;
-    var timer;
     var useNotification = false;
     var worker;
+    var notification;
 
     calibrate();
 
@@ -20,37 +24,33 @@ $(document).ready(function () {
         if ($('#notification').is(':checked')) {
             useNotification = true;
             Notification.requestPermission();
-            if (localStorage) localStorage['useNotification'] = true;
+            localStorage['useNotification'] = true;
         }
         else {
             useNotification = false;
-            if (localStorage) delete localStorage['useNotification'];
+            delete localStorage['useNotification'];
         }
     });
 
     function start() {
-
+        if (notification) notification.close();
         if(worker){
             worker.terminate();
         }
-
-        worker = new Worker('worker.js');
-
-        console.log(worker);
-
+        worker = new Worker('js/worker.js');
         worker.onmessage = function(e){
-
-            console.log(e.data);
-
-            var duration = e.data;
-
-            $('#time-left').text(duration);
-            $(document).prop('title', duration);
+            if (e.data == 'notify' && useNotification){
+                notify();
+            }
+            else{
+                timeLeft = e.data.timeLeft;
+                var duration = moment.utc(timeLeft).format("mm:ss");
+                $('#time-left').text(duration);
+                $(document).prop('title', duration);
+                $('#timer').show();
+            }
         };
-
-        worker.postMessage('start');
-
-
+        worker.postMessage({timeLeft:timeLeft,tickTime:tickTime});
     }
 
     function reset(t) {
@@ -67,7 +67,8 @@ $(document).ready(function () {
     function notify() {
         playsound();
         if (Notification.permission === "granted") {
-            var notification = new Notification("Time to Go To Bed!");
+            if (notification) notification.close();
+            notification = new Notification("Time for Bed!",{icon:'icon.png'});
             setTimeout(function () {
                 notification.close();
             }, 5000)
