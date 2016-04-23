@@ -47,7 +47,6 @@ $(document).ready(function () {
                 var duration = moment.utc(timeLeft).format("mm:ss");
                 $('#time-left').text(duration);
                 $(document).prop('title', duration);
-                $('#timer').show();
             }
         };
         worker.postMessage({timeLeft:timeLeft,tickTime:tickTime});
@@ -95,5 +94,6 @@ $(document).ready(function () {
             }
             start();
         }
+        $('#timer').show();
     }
 });
