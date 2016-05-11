@@ -14,7 +14,7 @@ $(document).ready(function () {
     var worker;
     var notification;
     var lastCali;
-    var beforeTick = 20;
+    var beforeTick = 20 * 1000;
     var volume;
     var settingsOpen = false;
 
