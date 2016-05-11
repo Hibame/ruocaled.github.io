@@ -1,5 +1,7 @@
 onmessage = function(e) {
     var beforeTick = 20 * 1000; // 20 seconds to prepare;
+    var tickTime = 3 * 60 * 1000; // 3 minutes
+    var refreshRate = 100;
     if (e.data) {
         var data = e.data;
         setInterval(function () {
@@ -8,8 +10,9 @@ onmessage = function(e) {
                 if (t) data.timeLeft = data.timeLeft + t;
             }
 
-            data.timeLeft = data.timeLeft - 100;
-            if (data.timeLeft <= beforeTick && (beforeTick - data.timeLeft) <= 100) {
+            data.timeLeft = data.timeLeft - refreshRate;
+
+            if (data.timeLeft <= beforeTick && (beforeTick - data.timeLeft) <= refreshRate) {
                 postMessage('notify');
             }
 
@@ -17,8 +20,13 @@ onmessage = function(e) {
                 reset(data.timeLeft)
             }
 
-            postMessage({timeLeft:data.timeLeft});
+            if (data.timeLeft <= tickTime - 1000 && data.timeLeft >= tickTime - refreshRate - 1000){
+                postMessage('calibrate');
+            }
 
-        }, 100);
+            else{
+              postMessage({timeLeft:data.timeLeft});
+            }
+        }, refreshRate);
     }
 };
