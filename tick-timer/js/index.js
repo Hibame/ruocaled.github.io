@@ -14,6 +14,9 @@ $(document).ready(function () {
     var worker;
     var notification;
     var lastCali;
+    var beforeTick = 20;
+    var volume;
+    var settingsOpen = false;
 
     calibrate();
     autoStart();
@@ -23,6 +26,24 @@ $(document).ready(function () {
         reset();
         store();
         start();
+    });
+
+    $('body').click(function(evt){
+        if(evt.target.id == "settings")
+            return;
+        if(evt.target.id == "settings-btn")
+            return;
+        if($(evt.target).closest('#settings').length)
+            return;
+        if($(evt.target).closest('#settings-btn').length)
+            return;
+        $("#settings").css('left','-387px');
+
+
+    });
+
+    $('#settings-close-btn').click(function(){
+        $("#settings").css('left','-387px');
     });
 
     $('#notification').click(function () {
@@ -38,8 +59,24 @@ $(document).ready(function () {
         }
     });
 
+    $('#before-tick').on('input',function () {
+        beforeTick = $('#before-tick').val()  * 1000;
+        $('#before-tick-output').html(beforeTick / 1000);
+        if (localStorage) {
+            localStorage['beforeTick'] = beforeTick;
+        }
+        worker.postMessage({beforeTick: beforeTick});
+    });
+
+
+    $("#settings-btn").click(function(){
+
+        $("#settings").css('left','0');
+    });
+
     function start() {
         console.log('start()');
+        $('#before-tick-output').html(beforeTick / 1000);
         if (notification) notification.close();
         if(worker){
             worker.terminate();
@@ -58,13 +95,14 @@ $(document).ready(function () {
             print();
         };
         worker.postMessage({timeLeft:timeLeft,tickTime:tickTime});
+        worker.postMessage({beforeTick: beforeTick});
     }
 
     function print(){
         var duration = moment.utc(timeLeft).format("mm:ss");
         $('#time-left').text(duration);
         $(document).prop('title', duration);
-        $('#timer').show();
+        $('#timer').css('display','block');
     }
 
     function reset(t) {
@@ -102,6 +140,14 @@ $(document).ready(function () {
         if (localStorage && localStorage['useNotification']) {
             $('#notification').prop('checked', true);
             useNotification = true;
+        }
+        if (localStorage && localStorage['beforeTick']) {
+            beforeTick = parseInt(localStorage['beforeTick']);
+            $('#before-tick').val(beforeTick/1000);
+        }
+        if (localStorage && localStorage['volume']) {
+            volume = parseInt(localStorage['volume']);
+            $('#volume').val(volume);
         }
         if (localStorage && localStorage['lastCali']) {
             lastCali = new Date(localStorage['lastCali']);

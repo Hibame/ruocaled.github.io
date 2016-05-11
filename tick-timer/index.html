@@ -9,16 +9,36 @@
     <link rel="stylesheet" href="css/normalize.css">
 
         <link rel="stylesheet" href="css/style.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.3.1/css/simple-line-icons.css">
+
   </head>
   <body>
+
+
+  <a id="settings-btn"><i class="icons icon-settings"></i></a>
+  <div id="settings">
+      <div id="settings-wrapper">
+          <a id="settings-close-btn"><i class="icons icon-close"></i></a>
+      <h2>Settings</h2>
+      <div class="col">
+          <label>Notify me <output id="before-tick-output">20</output><span> secs</span> before time is up</label>
+
+      </div>
+      <div class="col">
+          <input id="before-tick" type="range" min="5" max="30" step="1" />
+      </div>
+      </div>
+  </div>
+
   <div id="timer" style="display: none">
       <h1 id="time-left"></h1>
 
       <button id='start'>Start / Reset</button>
       <br/>
       <input type="checkbox" name="vehicle" id="notification"> <span>Notification</span>
-
   </div>
+
+
 
   <div class="footer"><a class="link" href="https://www.youtube.com/watch?v=jqUvhqeFR4I" target="_blank" title="Press start when your character's energy regenerate, go to bed before timer is up">How does it work</a><a class="link" href="mailto:ruocaled@gmail.com">Feedback</a></div>
 
